@@ -1,6 +1,7 @@
 
 #include "core.h"
-
+#include <thread> // for std::this_thread::sleep_for
+#include <chrono> // for std::chrono::seconds
 
 // global variables
 
@@ -13,14 +14,18 @@ void renderScene();
 void resizeWindow(GLFWwindow* window, int width, int height);
 void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int mods);
 void updateScene();
-
+void DrawPolygon(int _x, int _y, int _sides, float _radius);
+float randomFloat();
+void movePoly();
 
 int main() {
 
 	//
 	// 1. Initialisation
 	//
-	
+
+	//Seeded Random
+	srand(time(NULL));
 
 	// Initialise glfw and setup window
 	glfwInit();
@@ -41,7 +46,7 @@ int main() {
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-	
+
 
 	// Set callback functions to handle different events
 	glfwSetFramebufferSizeCallback(window, resizeWindow); // resize window callback
@@ -51,18 +56,19 @@ int main() {
 	// Initialise glew
 	glewInit();
 
-	
+
 	// Setup window's initial size
 	resizeWindow(window, initWidth, initHeight);
 
 	// Initialise scene - geometry and shaders etc
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
 
+	gluOrtho2D(-1, 1, -1, 1);
 
 	//
 	// 2. Main loop
 	// 
-	
+
 
 	// Loop while program is not terminated.
 	while (!glfwWindowShouldClose(window)) {
@@ -90,7 +96,60 @@ void renderScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Render objects here...
+	//Triangle 1
+	/*
+	glBegin(GL_TRIANGLES);
+	glVertex2f(-1.0f, -1.0f);
+	glVertex2f(-1.0f, 1.0f);
+	glVertex2f(1.0f, -1.0f);
+
+	//Triangle 2
+	glVertex2f(-1.0f, 1.0f);
+	glVertex2f(1.0f, 1.0f);
+	glVertex2f(1.0f, -1.0f);
+
+	glEnd();
+	*/
+	DrawPolygon(1, 2, 3, 4.5);
+
+
 }
+
+void DrawPolygon(int _x, int _y, int _sides, float _radius)
+{
+	//Colour Random
+	//glColor3f(randomFloat(), randomFloat(), randomFloat());
+
+	glBegin(GL_POLYGON);
+	glVertex2f(-0.5, -0.5);
+	glVertex2f(-0.5, 0.5);
+	glVertex2f(0.5, 0.5);
+	glVertex2f(0.5, -0.5);
+
+	//glVertex2f(-randomFloat(), -randomFloat());
+	//glVertex2f(-randomFloat(), randomFloat());
+	//glVertex2f(randomFloat(), randomFloat());
+	//glVertex2f(randomFloat(), -randomFloat());
+	glEnd();
+
+	//std::this_thread::sleep_for(std::chrono::seconds(1));
+
+}
+
+void movePoly()
+{
+
+}
+
+
+float randomFloat() {
+	return (float)rand() / (float)RAND_MAX;
+}
+
+int randomInt() {
+	return (int)rand() / (int)RAND_MAX;
+}
+
 
 
 // Function to call when window resized
@@ -108,13 +167,13 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 		// check which key was pressed...
 		switch (key)
 		{
-			case GLFW_KEY_ESCAPE:
-				glfwSetWindowShouldClose(window, true);
-				break;
+		case GLFW_KEY_ESCAPE:
+			glfwSetWindowShouldClose(window, true);
+			break;
 
-			default:
-			{
-			}
+		default:
+		{
+		}
 		}
 	}
 	else if (action == GLFW_RELEASE) {
