@@ -22,6 +22,9 @@ void drawTriangle();
 void drawPolygon(int _x, int _y, int _sides, float _radius);
 void drawStar(float _atX, float _atY, float _innerRadius, float _outerRadius, int _points);
 void drawTank(float _atX, float _atY, float _orientation);
+void drawOcto(float _atX, float _atY, float _radius, float _points);
+void drawOverLap();
+void drawSemiCircle();
 
 
 float randomFloat(float max);
@@ -122,9 +125,11 @@ void renderScene()
 
 	//drawTriangle();
 	//drawPolygon(1, 2, 3, 4.5);
-	drawStar(0.0f, 0.0f, 0.4f, 0.8f, 5);
+	//drawStar(0.0f, 0.0f, 0.4f, 0.8f, 5);
 	//drawTank(0.1, 0.1, 0.1);
-
+	//drawOcto(0.0f, 0.0f, 0.5f, 8.0f);
+	drawOverLap();
+	//drawSemiCircle();
 }
 
 void drawTriangle()
@@ -217,7 +222,6 @@ void drawStar(float _atX, float _atY, float _innerRadius,
 
 }
 
-
 void drawTank(float _atX, float _atY, float _orientation) 
 {
 	// Render body
@@ -241,7 +245,110 @@ void drawTank(float _atX, float _atY, float _orientation)
 
 }
 
+void drawOcto(float _atX, float _atY, float _radius, float _points)
+{
+	const float  thetaStepSize = (2.0f * M_PI) / 8.0f;
 
+	glBegin(GL_TRIANGLE_FAN);
+
+	//glVertex2f(_atX, _atY);
+
+	float angleStep = 2 * M_PI / _points;
+	
+	for (int i = 0; i < _points; i++)
+	{
+		float x = cosf(thetaStepSize * float(i));
+		float y = sinf(thetaStepSize * float(i));
+
+		glVertex2f(x, y);
+	}
+
+	glEnd();
+
+}
+
+void drawOverLap()
+{
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	glBegin(GL_QUADS);
+	glColor3ub(0, 255, 0);
+	glVertex2f(-0.9f, -0.9f);
+	glVertex2f(-0.9f, 0.1f);
+	glVertex2f(0.1f, 0.1f);
+	glVertex2f(0.1f, -0.9f);
+	glEnd();
+
+	glBegin(GL_QUADS);
+	glColor3ub(0, 0, 255);
+	glVertex2f(-0.5f, -0.5f);
+	glVertex2f(-0.5f, 0.5f);
+	glVertex2f(0.5f, 0.5f);
+	glVertex2f(0.5f, -0.5f);
+	glEnd();
+	
+	glBegin(GL_QUADS);
+	glColor3ub(255, 0, 0);
+	glVertex2f(-0.2f, -0.9f);
+	glVertex2f(-0.2f, 0.2f);
+	glVertex2f(0.9f, 0.2f);
+	glVertex2f(0.9f, -0.9f);
+	glEnd();
+
+}
+
+void drawSemiCircle()
+{
+	glShadeModel(GL_FLAT);
+
+	glBegin(GL_TRIANGLE_STRIP);
+
+	glColor3ub(0, 255, 255);
+	glVertex2f(-0.25f, 0.0f);
+
+	glColor3ub(0, 255, 255);
+	glVertex2f(-0.75f, 0.0f);
+
+	glColor3ub(255, 0, 0);
+	glVertex2f(-0.216506351f, 0.125f);
+
+	glColor3ub(255, 0, 0);
+	glVertex2f(-0.649519053f, 0.375f);
+
+	glColor3ub(255, 255, 0);
+	glVertex2f(-0.125, 0.216506351f);
+
+	glColor3ub(255, 255, 0);
+	glVertex2f(-0.375f, 0.649519053f);
+
+	glColor3ub(0, 255, 0);
+	glVertex2f(0.0f, 0.25f);
+
+	glColor3ub(0, 255, 0);
+	glVertex2f(0.0f, 0.75f);
+
+	glColor3ub(0, 255, 255);
+	glVertex2f(0.125f, 0.216506351f);
+
+	glColor3ub(0, 255, 255);
+	glVertex2f(0.375f, 0.649519053f);
+
+	glColor3ub(0, 0, 255);
+	glVertex2f(0.216506351f, 0.125f);
+
+	glColor3ub(0, 0, 255);
+	glVertex2f(0.649519053f, 0.375f);
+
+	glColor3ub(255, 0, 255);
+	glVertex2f(0.25f, 0.0f);
+
+	glColor3ub(255, 0, 255);
+	glVertex2f(0.75f, 0.0f);
+
+	glEnd();
+}
 
 void movePoly()
 {
