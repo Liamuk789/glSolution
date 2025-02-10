@@ -232,6 +232,7 @@ void drawSemiCircle()
 	glEnd();
 }
 
+
 void movePoly()
 {
 

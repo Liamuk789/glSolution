@@ -43,6 +43,8 @@ void drawSemiCircle();
 float randomFloat(float max);
 void movePoly();*/
 
+void drawDots();
+
 int main() {
 
 	//
@@ -152,6 +154,19 @@ int main() {
 // renderScene - function to render the current scene
 void renderScene()
 {
+	
+	//drawDots();
+	//drawTriangle();
+	//drawPolygon(1, 2, 3, 4.5);
+	//drawStar(0.0f, 0.0f, 0.4f, 0.8f, 5);
+	drawTank(0.1, 0.1, 0.1);
+	//drawOcto(0.0f, 0.0f, 0.5f, 8.0f);
+	//drawOverLap();
+	//drawSemiCircle();
+}
+
+void drawDots()
+{
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -170,14 +185,6 @@ void renderScene()
 	}
 
 	glEnd();
-	
-	//drawTriangle();
-	//drawPolygon(1, 2, 3, 4.5);
-	//drawStar(0.0f, 0.0f, 0.4f, 0.8f, 5);
-	//drawTank(0.1, 0.1, 0.1);
-	//drawOcto(0.0f, 0.0f, 0.5f, 8.0f);
-	//drawOverLap();
-	//drawSemiCircle();
 }
 
 
@@ -189,17 +196,19 @@ void resizeWindow(GLFWwindow* window, int width, int height)
 
 void changeFunction()
 {
+	//static Shapes shape;
+
 	currentFunction = (currentFunction + 1) % 7;
 
 	switch (currentFunction)
 	{
 	case 0: drawTriangle();
 		break;
-	case 1: drawPolygon(1, 2, 3, 4.5);
+	case 1: drawPolygon(1, 2, 3, 4.5f);
 		break;
 	case 2: drawStar(0.0f, 0.0f, 0.4f, 0.8f, 5);
 		break;
-	case 3: drawTank(0.1, 0.1, 0.1);
+	case 3: drawTank(0.1f, 0.1f, 0.1f);
 		break;
 	case 4: drawOcto(0.0f, 0.0f, 0.5f, 8.0f);
 		break;
