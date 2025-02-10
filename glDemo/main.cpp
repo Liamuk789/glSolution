@@ -1,12 +1,22 @@
 #define _USE_MATH_DEFINES
 
 #include "core.h"
+#include "MyShapes.h"
 
-#include <thread> // for std::this_thread::sleep_for
-#include <chrono> // for std::chrono::seconds
-#include <cmath>
+using namespace std;
+
 
 // global variables
+mt19937 engine;
+uniform_real_distribution<float> range;
+uniform_real_distribution<float> colourRange;
+
+//vector<float> xValues;
+//vector<float> yValues;
+
+vector<glm::vec2> vertexCoords;
+vector<glm::vec4> coordColour;
+
 
 // Window size
 const unsigned int initWidth = 512;
@@ -18,7 +28,10 @@ void resizeWindow(GLFWwindow* window, int width, int height);
 void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int mods);
 void updateScene();
 
-void drawTriangle();
+int currentFunction = 0;
+void changeFunction();
+
+/*void drawTriangle();
 void drawPolygon(int _x, int _y, int _sides, float _radius);
 void drawStar(float _atX, float _atY, float _innerRadius, float _outerRadius, int _points);
 void drawTank(float _atX, float _atY, float _orientation);
@@ -28,7 +41,7 @@ void drawSemiCircle();
 
 
 float randomFloat(float max);
-void movePoly();
+void movePoly();*/
 
 int main() {
 
@@ -53,7 +66,7 @@ int main() {
 	// Check window was created successfully
 	if (window == NULL)
 	{
-		std::cout << "Failed to create GLFW window!\n";
+		cout << "Failed to create GLFW window!\n";
 		glfwTerminate();
 		return -1;
 	}
@@ -76,6 +89,41 @@ int main() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
 
 	gluOrtho2D(-1, 1, -1, 1);
+
+	random_device rd;
+	engine = mt19937(rd());
+	range = uniform_real_distribution<float>(-1.0f, 1.0f);
+	colourRange = uniform_real_distribution<float>(0.0f, 1.0f);
+
+	//Create 2 vector objects containing 100 elements all initialised to 0.0
+	//xValues = vector<float>(100, 0.0f);
+	//yValues = vector<float>(100, 0.0f);
+
+	//replacement vertexcoords container
+	vertexCoords = vector<glm::vec2>(100, glm::vec2(0.0f, 0.0f));
+	coordColour = vector<glm::vec4>(100, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+
+	// Iterate 100 times (once for each vertex) 
+	//and calculate and store the random x and y values
+
+	for (int i = 0; i < 100; i++)
+	{
+		float x = range(engine);
+		float y = range(engine);
+
+		float r = range(engine);
+		float g = range(engine);
+		float b = range(engine);
+		float a = range(engine);
+
+		//float size = range(engine);
+
+		//xValues[i] = x;
+		//yValues[i] = y;
+
+		vertexCoords[i] = glm::vec2(x, y);
+		coordColour[i] = glm::vec4(r, g, b, a);
+	}
 
 	//
 	// 2. Main loop
@@ -107,269 +155,62 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Render objects here...
-	//Triangle 1
-	/*
-	glBegin(GL_TRIANGLES);
-	glVertex2f(-1.0f, -1.0f);
-	glVertex2f(-1.0f, 1.0f);
-	glVertex2f(1.0f, -1.0f);
+	glPointSize(randomFloat(100.0f));
+	glColor3ub(0, 180, 0);
 
-	//Triangle 2
-	glVertex2f(-1.0f, 1.0f);
-	glVertex2f(1.0f, 1.0f);
-	glVertex2f(1.0f, -1.0f);
+	glBegin(GL_POINTS);
+
+	// Render objects here...
+
+	for (int i = 0; i < 100; i++)
+	{
+		//glPointSize()
+		glVertex2f(vertexCoords[i].x, vertexCoords[i].y);
+		glColor4f(coordColour[i].r, coordColour[i].g, coordColour[i].b, coordColour[i].a);
+	}
 
 	glEnd();
-	*/
-
+	
 	//drawTriangle();
 	//drawPolygon(1, 2, 3, 4.5);
 	//drawStar(0.0f, 0.0f, 0.4f, 0.8f, 5);
 	//drawTank(0.1, 0.1, 0.1);
 	//drawOcto(0.0f, 0.0f, 0.5f, 8.0f);
-	drawOverLap();
+	//drawOverLap();
 	//drawSemiCircle();
 }
-
-void drawTriangle()
-{
-	glBegin(GL_TRIANGLES);
-
-	glColor3ub(255, 0, 255);
-	glVertex2f(-0.5f, -0.5f);
-	glColor3ub(0, 255, 0);
-	glVertex2f(0.0f, 0.5f);
-	glColor3ub(0, 0, 255);
-	glVertex2f(0.5f, -0.5f);
-
-
-	glEnd();
-}
-
-void drawPolygon(int _x, int _y, int _sides, float _radius)
-{
-	//Colour Random
-	//glColor3f(randomFloat(), randomFloat(), randomFloat());
-
-	glBegin(GL_POLYGON);
-
-	glVertex2f(-0.5, -0.5);
-	glVertex2f(-0.5, 0.5);
-	glVertex2f(0.5, 0.5);
-	glVertex2f(0.5, -0.5);
-
-	//glVertex2f(-randomFloat(), -randomFloat());
-	//glVertex2f(-randomFloat(), randomFloat());
-	//glVertex2f(randomFloat(), randomFloat());
-	//glVertex2f(randomFloat(), -randomFloat());
-	glEnd();
-
-	//std::this_thread::sleep_for(std::chrono::seconds(1));
-
-}
-
-void drawStar(float _atX, float _atY, float _innerRadius,
-	float _outerRadius, int _points)
-{
-	/*glBegin(GL_LINE_LOOP);
-
-	glVertex2f(0.0, 0.25f);
-	glVertex2f(0.1f, 0.1f);
-	glVertex2f(0.25f, 0.08f);
-	glVertex2f(0.15f, -0.05f);
-	glVertex2f(0.25f, -0.25f);
-	glVertex2f(0.0f, -0.125f);
-	glVertex2f(-0.25f, -0.25f);
-	glVertex2f(-0.15f, -0.05f);
-	glVertex2f(-0.25f, 0.08f);
-	glVertex2f(-0.1f, 0.1f);
-
-	glEnd();*/
-
-	// Start the line loop to create the star
-	glBegin(GL_TRIANGLE_FAN);
-
-	//glColor4f(1.0f, 1.0f, 1.0f,0.0f);
-	glVertex2f(_atX, _atY);
-
-	// Angle between each point on the star
-	// Divide by _points to get angle between each outer point
-	float angleStep = M_PI / _points;
-	int starPoints = 2 * _points;
-	// Loop to draw the star
-	for (int i = 0; i <= starPoints; ++i) 
-	{
-		
-		float angle = i * angleStep;
-		float radius = (i % 2 == 0) ? _outerRadius : _innerRadius; // Alternate between outer and inner radius
-
-		// Calculate x and y based on angle and radius
-		float x = _atX + cos(angle) * radius;
-		float y = _atY + sin(angle) * radius;
-
-		// Pass the vertex to OpenGL
-		if (i % 2 == 0)
-		{
-			glColor3f(randomFloat(1.0), randomFloat(1.0), randomFloat(1.0));
-		}
-		//glColor3f(randomFloat(1.0), randomFloat(1.0), randomFloat(1.0));
-		glVertex2f(x, y);
-	}
-
-	// End the line loop to finish drawing the star
-	glEnd();
-
-}
-
-void drawTank(float _atX, float _atY, float _orientation) 
-{
-	// Render body
-	glBegin(GL_LINE_LOOP);
-
-	glVertex2f(-0.75f, 0.4f);
-	glVertex2f(0.75f, 0.4f);
-	glVertex2f(0.75f, -0.4f);
-	glVertex2f(-0.75f, -0.4f);
-
-	glEnd();
-
-	// Render gun
-	glBegin(GL_LINE_LOOP);
-
-	glVertex2f(-0.5f, 0.3f);
-	glVertex2f(0.5f, 0.0f);
-	glVertex2f(-0.5f, -0.3f);
-
-	glEnd();
-
-}
-
-void drawOcto(float _atX, float _atY, float _radius, float _points)
-{
-	const float  thetaStepSize = (2.0f * M_PI) / 8.0f;
-
-	glBegin(GL_TRIANGLE_FAN);
-
-	//glVertex2f(_atX, _atY);
-
-	float angleStep = 2 * M_PI / _points;
-	
-	for (int i = 0; i < _points; i++)
-	{
-		float x = cosf(thetaStepSize * float(i));
-		float y = sinf(thetaStepSize * float(i));
-
-		glVertex2f(x, y);
-	}
-
-	glEnd();
-
-}
-
-void drawOverLap()
-{
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE);
-
-	glBegin(GL_QUADS);
-	glColor3ub(0, 255, 0);
-	glVertex2f(-0.9f, -0.9f);
-	glVertex2f(-0.9f, 0.1f);
-	glVertex2f(0.1f, 0.1f);
-	glVertex2f(0.1f, -0.9f);
-	glEnd();
-
-	glBegin(GL_QUADS);
-	glColor3ub(0, 0, 255);
-	glVertex2f(-0.5f, -0.5f);
-	glVertex2f(-0.5f, 0.5f);
-	glVertex2f(0.5f, 0.5f);
-	glVertex2f(0.5f, -0.5f);
-	glEnd();
-	
-	glBegin(GL_QUADS);
-	glColor3ub(255, 0, 0);
-	glVertex2f(-0.2f, -0.9f);
-	glVertex2f(-0.2f, 0.2f);
-	glVertex2f(0.9f, 0.2f);
-	glVertex2f(0.9f, -0.9f);
-	glEnd();
-
-}
-
-void drawSemiCircle()
-{
-	glShadeModel(GL_FLAT);
-
-	glBegin(GL_TRIANGLE_STRIP);
-
-	glColor3ub(0, 255, 255);
-	glVertex2f(-0.25f, 0.0f);
-
-	glColor3ub(0, 255, 255);
-	glVertex2f(-0.75f, 0.0f);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(-0.216506351f, 0.125f);
-
-	glColor3ub(255, 0, 0);
-	glVertex2f(-0.649519053f, 0.375f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(-0.125, 0.216506351f);
-
-	glColor3ub(255, 255, 0);
-	glVertex2f(-0.375f, 0.649519053f);
-
-	glColor3ub(0, 255, 0);
-	glVertex2f(0.0f, 0.25f);
-
-	glColor3ub(0, 255, 0);
-	glVertex2f(0.0f, 0.75f);
-
-	glColor3ub(0, 255, 255);
-	glVertex2f(0.125f, 0.216506351f);
-
-	glColor3ub(0, 255, 255);
-	glVertex2f(0.375f, 0.649519053f);
-
-	glColor3ub(0, 0, 255);
-	glVertex2f(0.216506351f, 0.125f);
-
-	glColor3ub(0, 0, 255);
-	glVertex2f(0.649519053f, 0.375f);
-
-	glColor3ub(255, 0, 255);
-	glVertex2f(0.25f, 0.0f);
-
-	glColor3ub(255, 0, 255);
-	glVertex2f(0.75f, 0.0f);
-
-	glEnd();
-}
-
-void movePoly()
-{
-
-}
-
-
-float randomFloat(float max) {
-	return (float)rand() / (float)RAND_MAX * max;
-}
-
-int randomInt() {
-	return (int)rand() / (int)RAND_MAX;
-}
-
 
 
 // Function to call when window resized
 void resizeWindow(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);		// Draw into entire window
+}
+
+void changeFunction()
+{
+	currentFunction = (currentFunction + 1) % 7;
+
+	switch (currentFunction)
+	{
+	case 0: drawTriangle();
+		break;
+	case 1: drawPolygon(1, 2, 3, 4.5);
+		break;
+	case 2: drawStar(0.0f, 0.0f, 0.4f, 0.8f, 5);
+		break;
+	case 3: drawTank(0.1, 0.1, 0.1);
+		break;
+	case 4: drawOcto(0.0f, 0.0f, 0.5f, 8.0f);
+		break;
+	case 5: drawOverLap();
+		break;
+	case 6: drawSemiCircle();
+		break;
+
+	default:
+		break;
+	}
 }
 
 
@@ -383,6 +224,14 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 		{
 		case GLFW_KEY_ESCAPE:
 			glfwSetWindowShouldClose(window, true);
+			break;
+
+		case GLFW_KEY_SPACE:
+			changeFunction();
+			break;
+
+		case GLFW_KEY_LEFT_SHIFT:
+			renderScene();
 			break;
 
 		default:
